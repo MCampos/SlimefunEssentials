@@ -13,9 +13,8 @@ import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import me.justahuman.slimefun_essentials.client.screen.ReloadingScreen;
 import me.justahuman.slimefun_essentials.utils.Payloads;
 import me.justahuman.slimefun_essentials.utils.Utils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +28,7 @@ public class EmiIntegration implements EmiPlugin {
     public void register(EmiRegistry emiRegistry) {
         if (!Payloads.metExpected()) {
             Payloads.onMeetExpected(() -> {
-                MinecraftClient client = MinecraftClient.getInstance();
+                Minecraft client = Minecraft.getInstance();
                 client.execute(() -> {
                     AtomicBoolean started = new AtomicBoolean(false);
                     client.setScreen(new ReloadingScreen(
@@ -50,7 +49,7 @@ public class EmiIntegration implements EmiPlugin {
 
         for (RecipeCategory recipeCategory : RecipeCategory.getRecipeCategories().values()) {
             final String workstationId = recipeCategory.id();
-            final Identifier categoryIdentifier = SlimefunEssentials.id(workstationId);
+            final ResourceLocation categoryIdentifier = SlimefunEssentials.id(workstationId);
             final EmiStack workStation = EmiStack.of(recipeCategory.itemStack());
             final SlimefunEmiCategory slimefunEmiCategory;
             if (CATEGORIES.containsKey(workstationId)) {

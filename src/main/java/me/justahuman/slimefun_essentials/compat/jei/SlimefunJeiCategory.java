@@ -15,8 +15,8 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class SlimefunJeiCategory implements IRecipeCategory<SlimefunRecipe> {
@@ -45,8 +45,8 @@ public class SlimefunJeiCategory implements IRecipeCategory<SlimefunRecipe> {
     }
 
     @Override
-    public @NotNull Text getTitle() {
-        return this.recipeCategory.itemStack().getName();
+    public @NotNull Component getTitle() {
+        return this.recipeCategory.itemStack().getHoverName();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class SlimefunJeiCategory implements IRecipeCategory<SlimefunRecipe> {
     }
 
     @Override
-    public void draw(SlimefunRecipe recipe, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(SlimefunRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         int xOffset = (this.background.getWidth() - recipeCategory.display().width(recipe)) / 2;
         int yOffset = (this.background.getHeight() - recipeCategory.display().height(recipe)) / 2;
 

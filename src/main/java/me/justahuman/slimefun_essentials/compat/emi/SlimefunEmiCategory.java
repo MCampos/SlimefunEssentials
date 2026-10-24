@@ -2,19 +2,19 @@ package me.justahuman.slimefun_essentials.compat.emi;
 
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public class SlimefunEmiCategory extends EmiRecipeCategory {
-    private final Text displayName;
+    private final Component displayName;
     
-    public SlimefunEmiCategory(Identifier id, EmiStack workstation) {
+    public SlimefunEmiCategory(ResourceLocation id, EmiStack workstation) {
         super(id, workstation);
-        this.displayName = workstation.getItemStack().getName();
+        this.displayName = workstation.getItemStack().getHoverName();
     }
 
     @Override
-    public Text getName() {
+    public Component getName() {
         return this.displayName;
     }
 }

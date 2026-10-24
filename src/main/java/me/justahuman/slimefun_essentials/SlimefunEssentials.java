@@ -19,8 +19,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,16 +55,16 @@ public class SlimefunEssentials implements ClientModInitializer {
         });
 
         if (CompatUtils.isClothConfigLoaded()) {
-            final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("slimefun_essentials.key_bind.open_config", GLFW.GLFW_KEY_F6, "slimefun_essentials.title"));
+            final KeyMapping keyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping("slimefun_essentials.key_bind.open_config", GLFW.GLFW_KEY_F6, "slimefun_essentials.title"));
             ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                if (keyBinding.isPressed()) {
-                    client.setScreen(ConfigScreen.buildScreen(client.currentScreen));
+                if (keyBinding.isDown()) {
+                    client.setScreen(ConfigScreen.buildScreen(client.screen));
                 }
             });
         }
     }
 
-    public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path.toLowerCase(Locale.ROOT));
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path.toLowerCase(Locale.ROOT));
     }
 }

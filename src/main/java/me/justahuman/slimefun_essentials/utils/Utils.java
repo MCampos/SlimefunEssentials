@@ -3,15 +3,15 @@ package me.justahuman.slimefun_essentials.utils;
 import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import me.justahuman.slimefun_essentials.client.SlimefunRegistry;
 import me.justahuman.slimefun_essentials.mixins.minecraft.TextTooltipAccessor;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -25,11 +25,11 @@ public class Utils {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%[a-zA-Z_]+%");
     public static final Set<String> HIDDEN_SF_IDS = Set.of("_UI_BACKGROUND", "_UI_INPUT_SLOT", "_UI_OUTPUT_SLOT");
 
-    public static boolean filterResources(Identifier identifier) {
+    public static boolean filterResources(ResourceLocation identifier) {
         return identifier.getPath().endsWith(".json");
     }
 
-    public static boolean filterVanillaItems(Identifier identifier) {
+    public static boolean filterVanillaItems(ResourceLocation identifier) {
         if (!filterResources(identifier)) {
             return false;
         }
@@ -43,24 +43,24 @@ public class Utils {
         return path.substring(path.lastIndexOf("/") + 1, path.indexOf(".json"));
     }
 
-    public static NbtCompound getPluginNbt(@Nullable ItemStack itemStack) {
-        return itemStack == null ? null : getPluginNbt(itemStack.getComponentChanges());
+    public static CompoundTag getPluginNbt(@Nullable ItemStack itemStack) {
+        return itemStack == null ? null : getPluginNbt(itemStack.getComponentsPatch());
     }
 
-    public static NbtCompound getPluginNbt(@Nullable ComponentChanges components) {
+    public static CompoundTag getPluginNbt(@Nullable DataComponentPatch components) {
         if (components == null || components.isEmpty()) {
             return null;
         }
-        Optional<? extends NbtComponent> customData = components.get(DataComponentTypes.CUSTOM_DATA);
-        return customData != null ? customData.map(NbtComponent::getNbt).map(compound -> compound.getCompound("PublicBukkitValues")).orElse(null) : null;
+        Optional<? extends CustomData> customData = components.get(DataComponents.CUSTOM_DATA);
+        return customData != null ? customData.map(CustomData::getUnsafe).map(compound -> compound.getCompound("PublicBukkitValues")).orElse(null) : null;
     }
 
     public static String getSlimefunId(@Nullable ItemStack itemStack) {
-        return itemStack == null ? null : getSlimefunId(itemStack.getComponentChanges());
+        return itemStack == null ? null : getSlimefunId(itemStack.getComponentsPatch());
     }
 
-    public static String getSlimefunId(@Nullable ComponentChanges components) {
-        final NbtCompound pluginNbt = getPluginNbt(components);
+    public static String getSlimefunId(@Nullable DataComponentPatch components) {
+        final CompoundTag pluginNbt = getPluginNbt(components);
         if (pluginNbt == null || !pluginNbt.contains("slimefun:slimefun_item")) {
             return null;
         }
@@ -68,11 +68,11 @@ public class Utils {
     }
 
     public static String getGuideMode(@Nullable ItemStack itemStack) {
-        return itemStack == null ? null : getGuideMode(itemStack.getComponentChanges());
+        return itemStack == null ? null : getGuideMode(itemStack.getComponentsPatch());
     }
 
-    public static String getGuideMode(@Nullable ComponentChanges components) {
-        final NbtCompound pluginNbt = getPluginNbt(components);
+    public static String getGuideMode(@Nullable DataComponentPatch components) {
+        final CompoundTag pluginNbt = getPluginNbt(components);
         if (pluginNbt == null || !pluginNbt.contains("slimefun:slimefun_guide_mode")) {
             return null;
         }
@@ -120,18 +120,18 @@ public class Utils {
         return number == null ? defaultValue : number;
     }
 
-    public static List<TooltipComponent> updateTooltip(List<TooltipComponent> tooltip, SlimefunRecipe recipe) {
+    public static List<ClientTooltipComponent> updateTooltip(List<ClientTooltipComponent> tooltip, SlimefunRecipe recipe) {
         if (tooltip.isEmpty()) {
             return tooltip;
         }
 
         List<String> strings = tooltip.stream().map(component -> from(((TextTooltipAccessor) component).getText())).map(string -> fillPlaceholders(string, recipe)).toList();
-        List<TooltipComponent> newTooltip = new ArrayList<>();
-        strings.forEach(string -> newTooltip.add(TooltipComponent.of(Text.literal(string).asOrderedText())));
+        List<ClientTooltipComponent> newTooltip = new ArrayList<>();
+        strings.forEach(string -> newTooltip.add(ClientTooltipComponent.create(Component.literal(string).getVisualOrderText())));
         return newTooltip;
     }
 
-    private static String from(OrderedText text) {
+    private static String from(FormattedCharSequence text) {
         final StringBuilder builder = new StringBuilder();
         text.accept((index, style, c) -> {
             builder.appendCodePoint(c);

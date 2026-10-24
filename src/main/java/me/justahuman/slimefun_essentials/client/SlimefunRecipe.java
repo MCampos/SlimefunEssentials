@@ -8,8 +8,7 @@ import com.google.gson.JsonPrimitive;
 import me.justahuman.slimefun_essentials.api.DisplayComponentType;
 import me.justahuman.slimefun_essentials.utils.DataUtils;
 import me.justahuman.slimefun_essentials.utils.JsonUtils;
-import net.minecraft.item.ItemStack;
-
+import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 

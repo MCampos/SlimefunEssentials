@@ -9,26 +9,25 @@ import me.justahuman.slimefun_essentials.client.payload.ItemsPayload;
 import me.justahuman.slimefun_essentials.client.payload.LoadingStatePayload;
 import me.justahuman.slimefun_essentials.client.payload.RecipeCategoriesPayload;
 import me.justahuman.slimefun_essentials.client.payload.RecipeDisplayPayload;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.toast.ToastManager;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 public class Payloads {
     public static final String PLUGIN_ID = "slimefun_server_essentials";
-    public static final CustomPayload.Id<ComponentTypePayload> COMPONENT_TYPE_CHANNEL = newChannel("component_types");
-    public static final CustomPayload.Id<ItemsPayload> ITEM_CHANNEL = newChannel("items");
-    public static final CustomPayload.Id<RecipeDisplayPayload> RECIPE_DISPLAY_CHANNEL = newChannel("recipe_displays");
-    public static final CustomPayload.Id<RecipeCategoriesPayload> RECIPE_CATEGORIES_CHANNEL = newChannel("recipe_categories");
-    public static final CustomPayload.Id<LoadingStatePayload> LOADING_STATE_CHANNEL = newChannel("loading_state");
+    public static final CustomPacketPayload.Type<ComponentTypePayload> COMPONENT_TYPE_CHANNEL = newChannel("component_types");
+    public static final CustomPacketPayload.Type<ItemsPayload> ITEM_CHANNEL = newChannel("items");
+    public static final CustomPacketPayload.Type<RecipeDisplayPayload> RECIPE_DISPLAY_CHANNEL = newChannel("recipe_displays");
+    public static final CustomPacketPayload.Type<RecipeCategoriesPayload> RECIPE_CATEGORIES_CHANNEL = newChannel("recipe_categories");
+    public static final CustomPacketPayload.Type<LoadingStatePayload> LOADING_STATE_CHANNEL = newChannel("loading_state");
 
     private static final Type RECEIVING_TOAST_TYPE = new Type("receiving_expected_packets");
     private static final Type RECEIVED_TOAST_TYPE = new Type("received_expected_packets");
@@ -42,8 +41,8 @@ public class Payloads {
 
     private static Runnable showToast(Type type) {
         return () -> {
-            Text title = Text.translatable("slimefun_essentials.toast." + type.type);
-            Text description = Text.translatable("slimefun_essentials.toast." + type.type + ".description",
+            Component title = Component.translatable("slimefun_essentials.toast." + type.type);
+            Component description = Component.translatable("slimefun_essentials.toast." + type.type + ".description",
                     PACKET_COUNTS.getOrDefault(ComponentTypePayload.class, 0),
                     EXPECTED_PACKETS.getOrDefault(ComponentTypePayload.class, 0),
                     PACKET_COUNTS.getOrDefault(ItemsPayload.class, 0),
@@ -52,12 +51,12 @@ public class Payloads {
                     EXPECTED_PACKETS.getOrDefault(RecipeCategoriesPayload.class, 0),
                     PACKET_COUNTS.getOrDefault(RecipeDisplayPayload.class, 0),
                     EXPECTED_PACKETS.getOrDefault(RecipeDisplayPayload.class, 0));
-            ToastManager manager = MinecraftClient.getInstance().getToastManager();
+            ToastManager manager = Minecraft.getInstance().getToastManager();
             SystemToast existing = manager.getToast(SystemToast.class, type);
             if (existing != null) {
-                existing.setContent(title, description);
+                existing.reset(title, description);
             } else {
-                manager.add(new SystemToast(type, title, description));
+                manager.addToast(new SystemToast(type, title, description));
             }
         };
     }
@@ -115,19 +114,19 @@ public class Payloads {
         }
     }
 
-    public static <P extends CustomPayload> CustomPayload.Id<P> newChannel(String channel) {
-        return new CustomPayload.Id<>(Identifier.of(PLUGIN_ID, channel));
+    public static <P extends CustomPacketPayload> CustomPacketPayload.Type<P> newChannel(String channel) {
+        return new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PLUGIN_ID, channel));
     }
 
-    public static <P extends CustomPayload>PacketCodec<PacketByteBuf, P> newSplitCodec(Function<ByteArrayDataInput, P> decoder, P empty) {
-        return new PacketCodec<>() {
+    public static <P extends CustomPacketPayload>StreamCodec<FriendlyByteBuf, P> newSplitCodec(Function<ByteArrayDataInput, P> decoder, P empty) {
+        return new StreamCodec<>() {
             private final Map<Integer, byte[][]> received = new HashMap<>();
 
             @Override
-            public void encode(PacketByteBuf buf, P value) {}
+            public void encode(FriendlyByteBuf buf, P value) {}
 
             @Override
-            public P decode(PacketByteBuf buf) {
+            public P decode(FriendlyByteBuf buf) {
                 PACKET_COUNTS.compute(empty.getClass(), (k, v) -> v == null ? 1 : v + 1);
 
                 byte[] bytes = new byte[buf.readableBytes()];
@@ -164,8 +163,8 @@ public class Payloads {
         };
     }
 
-    public static <P extends CustomPayload>PacketCodec<PacketByteBuf, P> newCodec(Function<ByteArrayDataInput, P> decoder) {
-        return PacketCodec.of((value, buf) -> {}, buf -> {
+    public static <P extends CustomPacketPayload>StreamCodec<FriendlyByteBuf, P> newCodec(Function<ByteArrayDataInput, P> decoder) {
+        return StreamCodec.ofMember((value, buf) -> {}, buf -> {
             byte[] bytes = new byte[buf.readableBytes()];
             for (int i = 0; i < bytes.length; i++) {
                 bytes[i] = buf.readByte();
@@ -174,7 +173,7 @@ public class Payloads {
         });
     }
 
-    private static class Type extends SystemToast.Type {
+    private static class Type extends SystemToast.SystemToastId {
         final String type;
 
         public Type(String type) {

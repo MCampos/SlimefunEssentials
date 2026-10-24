@@ -9,8 +9,7 @@ import me.justahuman.slimefun_essentials.SlimefunEssentials;
 import me.justahuman.slimefun_essentials.api.RecipeDisplay;
 import me.justahuman.slimefun_essentials.utils.DataUtils;
 import me.justahuman.slimefun_essentials.utils.JsonUtils;
-import net.minecraft.item.ItemStack;
-
+import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
