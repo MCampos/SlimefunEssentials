@@ -10,8 +10,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ClientLifecycleHandler.class, remap = false)
 public abstract class ClientLifecycleHandlerMixin implements JeiReloader {
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void onInit(CallbackInfo ci) {
+    // JEI ships optimised bytecode that reuses local slot 0 inside the constructor, which breaks a
+    // constructor-RETURN injection with a VerifyError. registerEvents() runs once right after
+    // construction and is a plain instance method, so slot 0 is guaranteed to be `this` at HEAD.
+    @Inject(method = "registerEvents", at = @At("HEAD"))
+    public void onRegisterEvents(CallbackInfo ci) {
         JeiReloader.instance.set(this);
     }
 
