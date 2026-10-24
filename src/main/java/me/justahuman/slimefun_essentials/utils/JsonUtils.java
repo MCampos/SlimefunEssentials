@@ -15,7 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class JsonUtils {
         json.addProperty("item", BuiltInRegistries.ITEM.getKey(itemStack.getItem()).toString());
         json.addProperty("amount", itemStack.getCount());
         if (changes != DataComponentPatch.EMPTY) {
-            json.addProperty("components", DataComponentPatch.CODEC.encodeStart(withRegistryAccess(NbtOps.INSTANCE), changes).getOrThrow().getAsString());
+            json.addProperty("components", DataComponentPatch.CODEC.encodeStart(withRegistryAccess(NbtOps.INSTANCE), changes).getOrThrow().toString());
         }
         return json.toString();
     }
@@ -108,12 +108,12 @@ public class JsonUtils {
             return ItemStack.EMPTY;
         }
 
-        final ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(json.get("id").getAsString())));
+        final ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.tryParse(json.get("id").getAsString())));
         itemStack.setCount(GsonHelper.getAsInt(json, "amount", 1));
 
         try {
             if (itemStack.getComponents() instanceof PatchedDataComponentMap components && json.get("components") instanceof JsonPrimitive primitive && primitive.isString()) {
-                components.restorePatch(DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseTag(primitive.getAsString())).getOrThrow().getFirst());
+                components.restorePatch(DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseCompoundFully(primitive.getAsString())).getOrThrow().getFirst());
             }
         } catch (Exception e) {
             SlimefunEssentials.LOGGER.error("Failed to deserialize item components", e);

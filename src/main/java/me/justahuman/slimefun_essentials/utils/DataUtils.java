@@ -11,19 +11,19 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataUtils {
     public static ItemStack get(ByteArrayDataInput input) {
-        final ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(input.readUTF())));
+        final ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.tryParse(input.readUTF())));
         itemStack.setCount(input.readInt());
 
         try {
             if (input.readBoolean() && itemStack.getComponents() instanceof PatchedDataComponentMap components) {
-                components.restorePatch(DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseTag(input.readUTF())).getOrThrow().getFirst());
+                components.restorePatch(DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseCompoundFully(input.readUTF())).getOrThrow().getFirst());
             }
         } catch (Exception e) {
             SlimefunEssentials.LOGGER.error("Failed to deserialize item components", e);

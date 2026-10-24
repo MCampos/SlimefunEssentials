@@ -4,7 +4,7 @@ import me.justahuman.slimefun_essentials.api.CustomRenderable;
 import me.justahuman.slimefun_essentials.api.RecipeCondition;
 import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import java.util.List;
 
 public class OptionalRenderable implements CustomRenderable {
@@ -18,7 +18,7 @@ public class OptionalRenderable implements CustomRenderable {
     }
 
     @Override
-    public ResourceLocation identifier() {
+    public Identifier identifier() {
         return this.renderable.identifier();
     }
 

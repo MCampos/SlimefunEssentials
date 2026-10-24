@@ -15,13 +15,13 @@ import me.justahuman.slimefun_essentials.utils.Payloads;
 import me.justahuman.slimefun_essentials.utils.CompatUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +30,15 @@ import java.util.Locale;
 public class SlimefunEssentials implements ClientModInitializer {
     public static final String MOD_ID = "slimefun_essentials";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(id("main"));
 
     @Override
     public void onInitializeClient() {
-        PayloadTypeRegistry.playS2C().register(Payloads.LOADING_STATE_CHANNEL, LoadingStatePayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(Payloads.ITEM_CHANNEL, ItemsPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(Payloads.COMPONENT_TYPE_CHANNEL, ComponentTypePayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(Payloads.RECIPE_CATEGORIES_CHANNEL, RecipeCategoriesPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(Payloads.RECIPE_DISPLAY_CHANNEL, RecipeDisplayPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(Payloads.LOADING_STATE_CHANNEL, LoadingStatePayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(Payloads.ITEM_CHANNEL, ItemsPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(Payloads.COMPONENT_TYPE_CHANNEL, ComponentTypePayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(Payloads.RECIPE_CATEGORIES_CHANNEL, RecipeCategoriesPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(Payloads.RECIPE_DISPLAY_CHANNEL, RecipeDisplayPayload.CODEC);
         ModConfig.loadConfig();
 
         ClientPlayNetworking.registerGlobalReceiver(Payloads.LOADING_STATE_CHANNEL, (payload, context) -> Payloads.expect(payload));
@@ -55,16 +56,16 @@ public class SlimefunEssentials implements ClientModInitializer {
         });
 
         if (CompatUtils.isClothConfigLoaded()) {
-            final KeyMapping keyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping("slimefun_essentials.key_bind.open_config", GLFW.GLFW_KEY_F6, "slimefun_essentials.title"));
+            final KeyMapping keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping("slimefun_essentials.key_bind.open_config", InputConstants.KEY_F6, KEY_CATEGORY));
             ClientTickEvents.END_CLIENT_TICK.register(client -> {
                 if (keyBinding.isDown()) {
-                    client.setScreen(ConfigScreen.buildScreen(client.screen));
+                    client.gui.setScreen(ConfigScreen.buildScreen(client.gui.screen()));
                 }
             });
         }
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path.toLowerCase(Locale.ROOT));
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path.toLowerCase(Locale.ROOT));
     }
 }

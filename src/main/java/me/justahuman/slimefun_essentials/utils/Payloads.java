@@ -16,7 +16,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -51,7 +51,7 @@ public class Payloads {
                     EXPECTED_PACKETS.getOrDefault(RecipeCategoriesPayload.class, 0),
                     PACKET_COUNTS.getOrDefault(RecipeDisplayPayload.class, 0),
                     EXPECTED_PACKETS.getOrDefault(RecipeDisplayPayload.class, 0));
-            ToastManager manager = Minecraft.getInstance().getToastManager();
+            ToastManager manager = Minecraft.getInstance().gui.toastManager();
             SystemToast existing = manager.getToast(SystemToast.class, type);
             if (existing != null) {
                 existing.reset(title, description);
@@ -115,7 +115,7 @@ public class Payloads {
     }
 
     public static <P extends CustomPacketPayload> CustomPacketPayload.Type<P> newChannel(String channel) {
-        return new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PLUGIN_ID, channel));
+        return new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PLUGIN_ID, channel));
     }
 
     public static <P extends CustomPacketPayload>StreamCodec<FriendlyByteBuf, P> newSplitCodec(Function<ByteArrayDataInput, P> decoder, P empty) {

@@ -12,7 +12,7 @@ public class CompatUtils {
     }
 
     public static boolean isRecipeModLoaded() {
-        return isEmiLoaded() || isReiLoaded() || isJeiLoaded();
+        return isReiLoaded() || isJeiLoaded();
     }
 
     public static boolean isEmiLoaded() {

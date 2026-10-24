@@ -5,7 +5,7 @@ import me.justahuman.slimefun_essentials.api.DisplayComponentType;
 import me.justahuman.slimefun_essentials.api.def.DrawMode;
 import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import me.justahuman.slimefun_essentials.utils.Utils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public record BasicComponentType(String type, CustomRenderable light, CustomRend
     }
 
     @Override
-    public void draw(SlimefunRecipe recipe, DrawMode mode, GuiGraphics context, int x, int y) {
+    public void draw(SlimefunRecipe recipe, DrawMode mode, GuiGraphicsExtractor context, int x, int y) {
         draw(recipe, mode == DrawMode.LIGHT ? light : dark, context, x, y);
     }
 }

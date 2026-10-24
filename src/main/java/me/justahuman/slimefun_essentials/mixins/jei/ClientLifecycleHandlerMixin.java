@@ -17,10 +17,8 @@ public abstract class ClientLifecycleHandlerMixin implements JeiReloader {
 
     @Override
     public void slimefunEssentials$reloadJei() {
-        stopJei();
-        startJei();
+        restartJei();
     }
 
-    @Shadow protected abstract void stopJei();
-    @Shadow protected abstract void startJei();
+    @Shadow public abstract void restartJei();
 }

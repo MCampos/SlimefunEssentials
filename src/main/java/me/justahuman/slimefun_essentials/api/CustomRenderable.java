@@ -6,12 +6,12 @@ import me.justahuman.slimefun_essentials.client.renderable.ConditionalRenderable
 import me.justahuman.slimefun_essentials.client.renderable.OptionalRenderable;
 import me.justahuman.slimefun_essentials.client.renderable.SimpleRenderable;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import java.util.List;
 
 public interface CustomRenderable {
-    ResourceLocation identifier();
+    Identifier identifier();
     int width();
     int height();
     int u();

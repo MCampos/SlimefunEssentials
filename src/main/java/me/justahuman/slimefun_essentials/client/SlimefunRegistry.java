@@ -11,7 +11,7 @@ import lombok.Setter;
 import me.justahuman.slimefun_essentials.SlimefunEssentials;
 import me.justahuman.slimefun_essentials.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -71,7 +71,7 @@ public class SlimefunRegistry {
     }
 
     public static void loadCustomModels(ResourceManager manager, String directory) {
-        for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources("models/" + directory, Utils::filterVanillaItems).entrySet()) {
+        for (Map.Entry<Identifier, Resource> entry : manager.listResources("models/" + directory, Utils::filterVanillaItems).entrySet()) {
             final Resource resource = entry.getValue();
             if (BuiltInPackSource.VANILLA_ID.equals(resource.sourcePackId())) {
                 continue;

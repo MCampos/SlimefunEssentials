@@ -9,7 +9,7 @@ import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import me.justahuman.slimefun_essentials.utils.DataUtils;
 import me.justahuman.slimefun_essentials.utils.JsonUtils;
 import me.justahuman.slimefun_essentials.utils.Utils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,7 @@ public record RecipeDisplayComponent(
     }
 
     @Override
-    public void draw(SlimefunRecipe recipe, DrawMode mode, GuiGraphics context, int x, int y) {
+    public void draw(SlimefunRecipe recipe, DrawMode mode, GuiGraphicsExtractor context, int x, int y) {
         if (this.renderable != null) {
             getType().draw(recipe, this.renderable, context, x, y);
         } else {

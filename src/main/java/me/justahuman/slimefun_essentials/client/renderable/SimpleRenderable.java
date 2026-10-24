@@ -7,11 +7,11 @@ import me.justahuman.slimefun_essentials.utils.DataUtils;
 import me.justahuman.slimefun_essentials.utils.JsonUtils;
 import me.justahuman.slimefun_essentials.utils.TextureUtils;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import java.util.List;
 
 public record SimpleRenderable(
-        ResourceLocation identifier,
+        Identifier identifier,
         int width, int height,
         int u, int v,
         int textureWidth, int textureHeight,
@@ -19,7 +19,7 @@ public record SimpleRenderable(
 ) implements CustomRenderable {
     public static SimpleRenderable deserialize(ByteArrayDataInput input) {
         return new SimpleRenderable(
-            ResourceLocation.tryParse(DataUtils.get(input, TextureUtils.WIDGETS.toString())),
+            Identifier.tryParse(DataUtils.get(input, TextureUtils.WIDGETS.toString())),
             input.readInt(),
             input.readInt(),
             DataUtils.get(input, 0),
@@ -32,7 +32,7 @@ public record SimpleRenderable(
 
     public static SimpleRenderable deserialize(JsonObject json) {
         return new SimpleRenderable(
-            ResourceLocation.tryParse(JsonUtils.get(json, "identifier", TextureUtils.WIDGETS.toString())),
+            Identifier.tryParse(JsonUtils.get(json, "identifier", TextureUtils.WIDGETS.toString())),
             json.get("width").getAsInt(),
             json.get("height").getAsInt(),
             JsonUtils.get(json, "u", 0),

@@ -14,7 +14,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -24,7 +24,7 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.library.ingredients.subtypes.SubtypeInterpreters;
 import mezz.jei.library.load.registration.SubtypeRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public class JeiIntegration implements IModPlugin {
     public static final JeiRecipeInterpreter RECIPE_INTERPRETER = new JeiRecipeInterpreter();
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() {
+    public @NotNull Identifier getPluginUid() {
         return SlimefunEssentials.id("jei_integration");
     }
 
@@ -112,7 +112,7 @@ public class JeiIntegration implements IModPlugin {
         }
 
         for (RecipeCategory recipeCategory : RecipeCategory.getRecipeCategories().values()) {
-            registration.addRecipes(RecipeType.create(SlimefunEssentials.MOD_ID, recipeCategory.id().toLowerCase(), SlimefunRecipe.class), recipeCategory.childRecipes());
+            registration.addRecipes(SlimefunJeiCategory.recipeType(recipeCategory), recipeCategory.childRecipes());
         }
     }
 
@@ -124,7 +124,7 @@ public class JeiIntegration implements IModPlugin {
         }
 
         for (RecipeCategory recipeCategory : RecipeCategory.getRecipeCategories().values()) {
-            registration.addRecipeCatalyst(recipeCategory.itemStack(), RecipeType.create(SlimefunEssentials.MOD_ID, recipeCategory.id().toLowerCase(), SlimefunRecipe.class));
+            registration.addCraftingStation(SlimefunJeiCategory.recipeType(recipeCategory), recipeCategory.itemStack());
         }
     }
 
@@ -150,9 +150,9 @@ public class JeiIntegration implements IModPlugin {
         Minecraft client = Minecraft.getInstance();
         client.execute(() -> {
             AtomicBoolean started = new AtomicBoolean(false);
-            client.setScreen(new ReloadingScreen(
+            client.gui.setScreen(new ReloadingScreen(
                     () -> !started.get() || !runtimeAvailable,
-                    () -> client.setScreen(null)
+                    () -> client.gui.setScreen(null)
             ));
             JeiReloader.reload();
             started.set(true);

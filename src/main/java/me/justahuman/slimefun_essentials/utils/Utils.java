@@ -4,11 +4,12 @@ import me.justahuman.slimefun_essentials.client.SlimefunRecipe;
 import me.justahuman.slimefun_essentials.client.SlimefunRegistry;
 import me.justahuman.slimefun_essentials.mixins.minecraft.TextTooltipAccessor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -16,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,11 +25,11 @@ public class Utils {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%[a-zA-Z_]+%");
     public static final Set<String> HIDDEN_SF_IDS = Set.of("_UI_BACKGROUND", "_UI_INPUT_SLOT", "_UI_OUTPUT_SLOT");
 
-    public static boolean filterResources(ResourceLocation identifier) {
+    public static boolean filterResources(Identifier identifier) {
         return identifier.getPath().endsWith(".json");
     }
 
-    public static boolean filterVanillaItems(ResourceLocation identifier) {
+    public static boolean filterVanillaItems(Identifier identifier) {
         if (!filterResources(identifier)) {
             return false;
         }
@@ -51,8 +51,8 @@ public class Utils {
         if (components == null || components.isEmpty()) {
             return null;
         }
-        Optional<? extends CustomData> customData = components.get(DataComponents.CUSTOM_DATA);
-        return customData != null ? customData.map(CustomData::getUnsafe).map(compound -> compound.getCompound("PublicBukkitValues")).orElse(null) : null;
+        CustomData customData = components.get(DataComponentMap.EMPTY, DataComponents.CUSTOM_DATA);
+        return customData != null ? customData.copyTag().getCompound("PublicBukkitValues").orElse(null) : null;
     }
 
     public static String getSlimefunId(@Nullable ItemStack itemStack) {
@@ -64,7 +64,7 @@ public class Utils {
         if (pluginNbt == null || !pluginNbt.contains("slimefun:slimefun_item")) {
             return null;
         }
-        return pluginNbt.getString("slimefun:slimefun_item");
+        return pluginNbt.getString("slimefun:slimefun_item").orElse(null);
     }
 
     public static String getGuideMode(@Nullable ItemStack itemStack) {
@@ -76,7 +76,7 @@ public class Utils {
         if (pluginNbt == null || !pluginNbt.contains("slimefun:slimefun_guide_mode")) {
             return null;
         }
-        return pluginNbt.getString("slimefun:slimefun_guide_mode");
+        return pluginNbt.getString("slimefun:slimefun_guide_mode").orElse(null);
     }
 
     public static String fillPlaceholders(String string, SlimefunRecipe recipe) {

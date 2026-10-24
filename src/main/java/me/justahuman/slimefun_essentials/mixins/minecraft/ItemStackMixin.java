@@ -6,7 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +43,7 @@ public abstract class ItemStackMixin {
             return;
         }
 
-        final ResourceLocation identifier = BuiltInRegistries.ITEM.getKey(getItem());
+        final Identifier identifier = BuiltInRegistries.ITEM.getKey(getItem());
         final String idLine = identifier.toString();
         for (int i = 0; i < lore.size(); i++) {
             String line = lore.get(i).getString();
