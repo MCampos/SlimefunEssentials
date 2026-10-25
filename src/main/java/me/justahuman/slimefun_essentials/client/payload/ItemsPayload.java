@@ -27,7 +27,7 @@ public class ItemsPayload implements CustomPacketPayload {
                     }
                 }
                 SlimefunRegistry.addItems(items);
-                Payloads.checkMetExpected();
+                Payloads.checkMetExpectedLater();
                 return EMPTY;
             }, EMPTY);
 

@@ -15,7 +15,7 @@ public class RecipeCategoriesPayload implements CustomPacketPayload {
                 for (int i = 0; i < size; i++) {
                     RecipeCategory.deserialize(input);
                 }
-                Payloads.checkMetExpected();
+                Payloads.checkMetExpectedLater();
                 return EMPTY;
             }, EMPTY);
 

@@ -12,7 +12,7 @@ public class ComponentTypePayload implements CustomPacketPayload {
             Payloads.newSplitCodec(input -> {
                 Payloads.readVersion(input);
                 DisplayComponentType.deserialize(input);
-                Payloads.checkMetExpected();
+                Payloads.checkMetExpectedLater();
                 return EMPTY;
             }, EMPTY);
 

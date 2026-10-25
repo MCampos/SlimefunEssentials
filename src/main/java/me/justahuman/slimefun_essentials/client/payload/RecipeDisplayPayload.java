@@ -13,7 +13,7 @@ public class RecipeDisplayPayload implements CustomPacketPayload {
             Payloads.newSplitCodec(input -> {
                 Payloads.readVersion(input);
                 BasicDisplay.deserialize(input);
-                Payloads.checkMetExpected();
+                Payloads.checkMetExpectedLater();
                 return EMPTY;
             }, EMPTY);
 

@@ -109,6 +109,14 @@ public class Payloads {
         checkMetExpected();
     }
 
+    /**
+     * Payload codecs run on the network thread; toasts and category finalisation belong on the
+     * render thread, so decoders schedule the check instead of running it inline.
+     */
+    public static void checkMetExpectedLater() {
+        Minecraft.getInstance().execute(Payloads::checkMetExpected);
+    }
+
     public static void checkMetExpected() {
         showToast(RECEIVING_TOAST_TYPE).run();
         for (Map.Entry<Class<?>, Integer> expected : EXPECTED_PACKETS.entrySet()) {
@@ -170,7 +178,7 @@ public class Payloads {
                         System.arraycopy(piecesBytes[i], 0, totalBytes, i * SPLIT_MESSAGE_SIZE, piecesBytes[i].length);
                     }
                     received.remove(id);
-                    return decoder.apply(ByteStreams.newDataInput(totalBytes));
+                    return Payloads.runDecoder(decoder, ByteStreams.newDataInput(totalBytes), empty.getClass());
                 }
                 return empty;
             }
@@ -183,8 +191,22 @@ public class Payloads {
             for (int i = 0; i < bytes.length; i++) {
                 bytes[i] = buf.readByte();
             }
-            return decoder.apply(ByteStreams.newDataInput(bytes));
+            return Payloads.runDecoder(decoder, ByteStreams.newDataInput(bytes), null);
         });
+    }
+
+    /**
+     * Runs a payload decoder and logs any failure with its stack trace before rethrowing. Minecraft
+     * itself only reports "Failed to decode packet" and keeps the cause at debug level, which makes
+     * protocol mismatches with the server plugin impossible to diagnose from a normal client log.
+     */
+    private static <P extends CustomPacketPayload> P runDecoder(Function<ByteArrayDataInput, P> decoder, ByteArrayDataInput input, Class<?> payloadClass) {
+        try {
+            return decoder.apply(input);
+        } catch (Throwable throwable) {
+            SlimefunEssentials.LOGGER.error("Failed to decode {} payload from SlimefunServerEssentials", payloadClass == null ? "a" : payloadClass.getSimpleName(), throwable);
+            throw throwable;
+        }
     }
 
     private static class Type extends SystemToast.SystemToastId {
