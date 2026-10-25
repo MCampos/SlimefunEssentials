@@ -11,6 +11,7 @@ public class RecipeDisplayPayload implements CustomPacketPayload {
     private static final RecipeDisplayPayload EMPTY = new RecipeDisplayPayload();
     public static final StreamCodec<FriendlyByteBuf, RecipeDisplayPayload> CODEC =
             Payloads.newSplitCodec(input -> {
+                Payloads.readVersion(input);
                 BasicDisplay.deserialize(input);
                 Payloads.checkMetExpected();
                 return EMPTY;

@@ -15,6 +15,7 @@ public class ItemsPayload implements CustomPacketPayload {
     public static final ItemsPayload EMPTY = new ItemsPayload();
     public static final StreamCodec<FriendlyByteBuf, ItemsPayload> CODEC =
             Payloads.newSplitCodec(input -> {
+                Payloads.readVersion(input);
                 int size = input.readInt();
                 Map<String, ItemStack> items = new LinkedHashMap<>(size);
                 for (int i = 0; i < size; i++) {
@@ -26,6 +27,7 @@ public class ItemsPayload implements CustomPacketPayload {
                     }
                 }
                 SlimefunRegistry.addItems(items);
+                Payloads.checkMetExpected();
                 return EMPTY;
             }, EMPTY);
 

@@ -10,6 +10,7 @@ public class ComponentTypePayload implements CustomPacketPayload {
     private static final ComponentTypePayload EMPTY = new ComponentTypePayload();
     public static final StreamCodec<FriendlyByteBuf, ComponentTypePayload> CODEC =
             Payloads.newSplitCodec(input -> {
+                Payloads.readVersion(input);
                 DisplayComponentType.deserialize(input);
                 Payloads.checkMetExpected();
                 return EMPTY;

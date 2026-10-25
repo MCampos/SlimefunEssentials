@@ -23,6 +23,8 @@ import java.util.function.Function;
 
 public class Payloads {
     public static final String PLUGIN_ID = "slimefun_server_essentials";
+    /** Data version written by SlimefunServerEssentials at the start of every registry payload. */
+    public static final int DATA_VERSION = 1;
     public static final CustomPacketPayload.Type<ComponentTypePayload> COMPONENT_TYPE_CHANNEL = newChannel("component_types");
     public static final CustomPacketPayload.Type<ItemsPayload> ITEM_CHANNEL = newChannel("items");
     public static final CustomPacketPayload.Type<RecipeDisplayPayload> RECIPE_DISPLAY_CHANNEL = newChannel("recipe_displays");
@@ -67,6 +69,18 @@ public class Payloads {
             previous.run();
             runnable.run();
         };
+    }
+
+    /**
+     * Reads the data version SlimefunServerEssentials (0.3.0+) prefixes to the component type, items,
+     * recipe category and recipe display payloads. The layout after it is unchanged for version 1.
+     */
+    public static int readVersion(ByteArrayDataInput input) {
+        int dataVersion = input.readInt();
+        if (dataVersion != DATA_VERSION) {
+            SlimefunEssentials.LOGGER.warn("Server sent data version {} but this client understands version {}; recipes may fail to load", dataVersion, DATA_VERSION);
+        }
+        return dataVersion;
     }
 
     public static boolean metExpected() {

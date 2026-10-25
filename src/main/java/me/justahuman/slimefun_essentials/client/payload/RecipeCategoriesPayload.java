@@ -10,6 +10,7 @@ public class RecipeCategoriesPayload implements CustomPacketPayload {
     private static final RecipeCategoriesPayload EMPTY = new RecipeCategoriesPayload();
     public static final StreamCodec<FriendlyByteBuf, RecipeCategoriesPayload> CODEC =
             Payloads.newSplitCodec(input -> {
+                Payloads.readVersion(input);
                 int size = input.readInt();
                 for (int i = 0; i < size; i++) {
                     RecipeCategory.deserialize(input);
