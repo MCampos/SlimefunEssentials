@@ -95,6 +95,7 @@ public class Payloads {
     }
 
     public static void expect(LoadingStatePayload payload) {
+        metExpected = false;
         EXPECTED_PACKETS.clear();
         EXPECTED_PACKETS.put(ComponentTypePayload.class, payload.typePackets());
         EXPECTED_PACKETS.put(ItemsPayload.class, payload.itemPackets());
@@ -118,6 +119,11 @@ public class Payloads {
     }
 
     public static void checkMetExpected() {
+        if (metExpected) {
+            // Checks are queued per packet; once the set is complete, later checks have nothing to add.
+            return;
+        }
+
         showToast(RECEIVING_TOAST_TYPE).run();
         for (Map.Entry<Class<?>, Integer> expected : EXPECTED_PACKETS.entrySet()) {
             if (PACKET_COUNTS.getOrDefault(expected.getKey(), 0) < expected.getValue()) {
